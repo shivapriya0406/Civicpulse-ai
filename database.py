@@ -142,7 +142,8 @@ def find_matching_complaint(
 
 
 def increment_duplicate_report(
-    tracking_id: str, citizen_email: str | None = None
+    tracking_id: str, citizen_email: str | None = None,
+    image_path: str | None = None,
 ) -> int:
     """Increment report count; repeated reports automatically become Critical."""
     init_db()
@@ -173,7 +174,8 @@ def increment_duplicate_report(
                        WHEN ? >= 2 THEN 'Critical'
                        ELSE severity
                    END
-                   , citizen_email = COALESCE(?, citizen_email)
+                   , citizen_email = COALESCE(?, citizen_email),
+                   image_path = COALESCE(?, image_path)
                WHERE id = ?""",
             (
                 next_count,
@@ -181,6 +183,7 @@ def increment_duplicate_report(
                 authority,
                 next_count,
                 citizen_email.strip().lower() if citizen_email else None,
+                image_path,
                 normalized_id,
             ),
         )
