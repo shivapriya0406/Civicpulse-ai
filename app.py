@@ -636,10 +636,45 @@ elif page == NAV_FEED:
             st.markdown(f"### {item['id']} · {item['category']}")
             st.write(f"**{item['location']}** · {item['severity']} · {item['status']}")
             st.write(item["description"])
+            saved_image = item.get("image_path")
+            if saved_image:
+                image_file = APP_DIR / saved_image
+                if image_file.is_file():
+                    st.image(str(image_file), use_container_width=True)
+            resolution_image = item.get("after_image_path")
+            if resolution_image:
+                resolution_file = APP_DIR / resolution_image
+                if resolution_file.is_file():
+                    st.markdown("**Resolution proof**")
+                    st.image(str(resolution_file), use_container_width=True)
             st.caption(f"{item['report_count']} citizen report(s) · {item['created_at']}")
 
 elif page == NAV_REPORT:
     show_hero("Your city, heard.", "Report an issue and help your city respond faster.")
+    evidence_mode = st.radio(
+        "Add visual evidence",
+        ("Camera", "Gallery", "Upload"),
+        horizontal=True,
+        key="report_evidence_mode",
+    )
+    selected_image = None
+    if evidence_mode == "Camera":
+        selected_image = st.camera_input("Take a photo", key="report_camera_capture")
+    elif evidence_mode == "Gallery":
+        selected_image = st.file_uploader(
+            "Choose a photo from your gallery",
+            type=["jpg", "jpeg", "png", "webp"],
+            key="report_gallery_image",
+        )
+    else:
+        selected_image = st.file_uploader(
+            "Upload a photo",
+            type=["jpg", "jpeg", "png", "webp"],
+            key="report_upload_image",
+        )
+    if selected_image is not None:
+        st.image(selected_image, caption="Evidence preview", use_container_width=True)
+
     with st.form("complaint_form"):
         location = st.text_input("Location", placeholder="Street, neighborhood, or landmark", key="report_location")
         description = st.text_area(
@@ -648,9 +683,6 @@ elif page == NAV_REPORT:
             height=110,
             max_chars=500,
             key="report_description",
-        )
-        uploaded = st.file_uploader(
-            "Add a photo (optional)", type=["jpg", "jpeg", "png", "webp"], key="report_image"
         )
         submitted = st.form_submit_button(
             "Submit Report", type="primary", use_container_width=True
@@ -666,12 +698,15 @@ elif page == NAV_REPORT:
             category, severity = analyze_complaint_ai(description, None)
             duplicate = find_matching_complaint(location.strip(), category, description.strip())
             if duplicate:
-                count = increment_duplicate_report(duplicate["id"], citizen_email=citizen_email)
+                image_path = save_upload(selected_image)
+                count = increment_duplicate_report(
+                    duplicate["id"], citizen_email=citizen_email, image_path=image_path
+                )
                 record_citizen_report(citizen_email, points=10)
                 st.session_state["duplicate_notice"] = {"id": duplicate["id"], "count": count}
                 st.session_state.pop("last_report", None)
             else:
-                image_path = save_upload(uploaded)
+                image_path = save_upload(selected_image)
                 image_for_analysis = str(APP_DIR / image_path) if image_path else None
                 category, severity = analyze_complaint_ai(description, image_for_analysis)
                 tracking_id = add_complaint(
@@ -827,12 +862,32 @@ elif page == NAV_OFFICER:
                 st.write(f"**Assigned Authority:** {complaint.get('assigned_authority') or 'Not assigned'}")
                 if not before_path or not before_path.is_file():
                     st.error("A Before image is required to verify repair work.")
-                with st.form(f"proof_form_{complaint['id']}"):
-                    after_upload = st.file_uploader(
-                        "Upload After-Repair Photo",
-                        type=["jpg", "jpeg", "png", "webp"],
-                        key=f"after_image_{complaint['id']}",
+                proof_mode = st.radio(
+                    "Resolution proof photo",
+                    ("Camera", "Gallery", "Upload"),
+                    horizontal=True,
+                    key=f"proof_mode_{complaint['id']}",
+                )
+                after_upload = None
+                if proof_mode == "Camera":
+                    after_upload = st.camera_input(
+                        "Take resolution photo", key=f"proof_camera_{complaint['id']}"
                     )
+                elif proof_mode == "Gallery":
+                    after_upload = st.file_uploader(
+                        "Choose resolution photo from gallery",
+                        type=["jpg", "jpeg", "png", "webp"],
+                        key=f"proof_gallery_{complaint['id']}",
+                    )
+                else:
+                    after_upload = st.file_uploader(
+                        "Upload resolution photo",
+                        type=["jpg", "jpeg", "png", "webp"],
+                        key=f"proof_upload_{complaint['id']}",
+                    )
+                if after_upload is not None:
+                    st.image(after_upload, caption="Resolution proof preview", use_container_width=True)
+                with st.form(f"proof_form_{complaint['id']}"):
                     verify_clicked = st.form_submit_button(
                         "Verify & Close Ticket", type="primary"
                     )
