@@ -1022,36 +1022,3 @@ elif page == NAV_HELPLINE:
         unsafe_allow_html=True,
     )
 
-st.markdown(
-    """
-    <footer style="margin-top:2rem;padding:1.4rem 1.6rem;background:linear-gradient(135deg,#ffffff 0%,#f3ebfc 100%);border:1px solid #c9a6eb;border-radius:16px;color:#231436;">
-      <h3 style="margin:0 0 .35rem;color:#231436;font-size:1.1rem;">24/7 Civic Helpline &amp; Emergency Support</h3>
-      <p style="margin:0 0 1rem;color:#4b3b5f;">Help is available whenever you need it.</p>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:.65rem;">
-        <div style="padding:.8rem 1rem;background:#ffffff;border:1px solid #c9a6eb;border-radius:10px;">
-          <strong style="color:#231436;">Municipal Civic Helpline</strong><br>
-          <a href="tel:155304" style="color:#833ec2;font-weight:700;text-decoration:none;">155304</a>
-          <span style="color:#4b3b5f;"> / </span>
-          <a href="tel:18004250000" style="color:#833ec2;font-weight:700;text-decoration:none;">1800-425-0000</a>
-        </div>
-        <div style="padding:.8rem 1rem;background:#ffffff;border:1px solid #c9a6eb;border-radius:10px;">
-          <strong style="color:#231436;">National Emergency</strong><br>
-          <a href="tel:112" style="color:#833ec2;font-weight:700;text-decoration:none;">112</a>
-        </div>
-        <div style="padding:.8rem 1rem;background:#ffffff;border:1px solid #c9a6eb;border-radius:10px;">
-          <strong style="color:#231436;">Ambulance</strong><br>
-          <a href="tel:108" style="color:#833ec2;font-weight:700;text-decoration:none;">108</a>
-        </div>
-        <div style="padding:.8rem 1rem;background:#ffffff;border:1px solid #c9a6eb;border-radius:10px;">
-          <strong style="color:#231436;">Fire</strong><br>
-          <a href="tel:101" style="color:#833ec2;font-weight:700;text-decoration:none;">101</a>
-        </div>
-        <div style="padding:.8rem 1rem;background:#ffffff;border:1px solid #c9a6eb;border-radius:10px;">
-          <strong style="color:#231436;">Citizen Support</strong><br>
-          <a href="mailto:support@civicpulse.gov.in" style="color:#833ec2;font-weight:700;text-decoration:none;">support@civicpulse.gov.in</a>
-        </div>
-      </div>
-    </footer>
-    """,
-    unsafe_allow_html=True,
-)
